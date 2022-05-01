@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:send_a_dm/text_field_widget.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class EnterNumberPage extends StatefulWidget {
@@ -13,6 +14,24 @@ class EnterNumberPage extends StatefulWidget {
 class _EnterNumberPageState extends State<EnterNumberPage> {
   late String whatsAppNumber;
   final TextEditingController _numberController = TextEditingController();
+  final String helloMessage =
+      'Hello Sapien!!!\nI hope you have a lovely day...\nSobuur✌.';
+  late FocusNode _focusNode;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _focusNode = FocusNode();
+  }
+
+  @override
+  void dispose() {
+    // Clean up the focus node when the Form is disposed.
+    _focusNode.dispose();
+
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,51 +45,26 @@ class _EnterNumberPageState extends State<EnterNumberPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              TextField(
-                controller: _numberController,
-                decoration: InputDecoration(
-                  labelText: 'Enter your 10 digits WhatsApp Number',
-                  border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(
-                          color: Color(0xFFE0DBFC), width: 8.0)),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: BorderSide(
-                      color: Colors.yellow..shade800,
-                      width: 2.0,
-                    ),
-                  ),
-                  errorBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: const BorderSide(
-                      color: Colors.red,
-                      width: 2.0,
-                    ),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                    borderSide: const BorderSide(
-                      color: Colors.black,
-                      width: 2.0,
-                    ),
-                  ),
-                ),
+              TextFieldWidget(
+                numberController: _numberController,
+                focusNode: _focusNode,
+                labelText: 'Enter your 11 digits WhatsApp Number',
               ),
-              const Padding(
-                  padding: EdgeInsets.only(
-                top: 20.0,
-              )),
+              const Padding(padding: EdgeInsets.only(top: 20.0)),
               Padding(
                 padding: const EdgeInsets.only(
-                  left: 8.0,
-                  right: 8.0,
+                  left: 16.0,
+                  right: 16.0,
                 ),
                 child: ElevatedButton(
-                  child: Text('Gbemilo WhatsApp'),
+                  child: const Text('Gbemilo WhatsApp'),
                   onPressed: () {
+                    _focusNode.requestFocus();
                     _sendMessageToWhatsApp();
                   },
+                  style: ElevatedButton.styleFrom(
+                    primary: const Color(0xFF7D5FFF),
+                  ),
                 ),
               )
             ],
@@ -81,11 +75,12 @@ class _EnterNumberPageState extends State<EnterNumberPage> {
   }
 
   void _sendMessageToWhatsApp() async {
-    var whatsAppNumber = _numberController.text;
-    final whatsappURlAndroid =
-        Uri.parse('whatsapp://send?phone=' '+234$whatsAppNumber' '&text=hwfa my boss..Oya drop message');
-    final whatappURLIOS =
-        Uri.parse('https://wa.me/$whatsAppNumber?text=${Uri.parse('hello')}');
+    whatsAppNumber = _numberController.text;
+    final whatsappURlAndroid = Uri.parse('whatsapp://send?phone='
+        '+234$whatsAppNumber'
+        '&text=$helloMessage');
+    final whatappURLIOS = Uri.parse(
+        'https://wa.me/$whatsAppNumber?text=${Uri.parse(helloMessage)}');
     if (Platform.isIOS) {
       // for iOS phone only
       if (await canLaunchUrl(whatappURLIOS)) {
@@ -93,8 +88,11 @@ class _EnterNumberPageState extends State<EnterNumberPage> {
           whatappURLIOS,
         );
       } else {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: new Text('whatsapp no installed')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Kindly confirm that WhatsApp is installed'),
+          ),
+        );
       }
     } else {
       // android , web
@@ -103,7 +101,7 @@ class _EnterNumberPageState extends State<EnterNumberPage> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: new Text('whatsapp no installed'),
+            content: const Text('Kindly confirm that WhatsApp is installed'),
             behavior: SnackBarBehavior.floating,
             action: SnackBarAction(
               label: 'Ok',
@@ -115,6 +113,8 @@ class _EnterNumberPageState extends State<EnterNumberPage> {
     }
   }
 }
+
+
 
 
 
